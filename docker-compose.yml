@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  db:
+    build: ./env/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: localuser
+      MYSQL_PASSWORD: localpass
+      TZ: Asia/Tokyo
+    volumes:
+      - ./env/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3310:3306"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./env/golang/Dockerfile
+    tty: true
+    environment:
+      APP_MODE: local
+      DB_USER: localuser
+      DB_PASSWORD: localpass
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: Asahi
+      DB_NAME_TEST: Asahi_test
+      DB_LOC: Asia%2FTokyo
+    volumes:
+      - ".:/src"
+    depends_on:
+      - db
+    command: go run main.go
+
+  proxy:
+    build: ./env/nginx
+    ports:
+      - 8082:80
+    depends_on:
+      - web
