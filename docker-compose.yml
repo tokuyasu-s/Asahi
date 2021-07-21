@@ -28,10 +28,10 @@ services:
       DB_NAME_TEST: Asahi_test
       DB_LOC: Asia%2FTokyo
     volumes:
-      - ".:/src"
+      - "./src:/go/src/Asahi/"
     depends_on:
       - db
-    command: go run main.go
+    command: " realize start --server"
 
   proxy:
     build: ./env/nginx
